@@ -1,0 +1,30 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+}
+.wsbk-popup { width: 268px; padding: 16px; }
+.wsbk-popup__head { display: flex; align-items: center; gap: 11px; }
+.wsbk-popup__icon { flex: none; display: block; }
+.wsbk-popup__id { min-width: 0; }
+.wsbk-popup__name { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.2; }
+.wsbk-popup__ver { margin: 3px 0 0; font-size: 12px; color: #6b6b6b; }
+.wsbk-popup__rule { border: 0; border-top: 1px solid rgba(0, 0, 0, 0.1); margin: 13px 0; }
+.wsbk-popup__blurb { margin: 0 0 11px; font-size: 12.5px; line-height: 1.5; color: #6b6b6b; }
+.wsbk-popup__bmc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffdd00;
+  color: #101010;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.wsbk-popup__bmc:hover { background: #f2d200; }
+.wsbk-popup__bmc-icon { flex: none; }
