@@ -85,22 +85,39 @@ td.results-table__body-cell.wsbk-points {
   scroll-margin-top: 80px;
 }
 
-/* Smooth-scroll "jump to PDFs" pill, placed before the results widget. */
+/* Smooth-scroll "jump to PDFs" pill, centered before the results widget.
+   display:flex + fit-content width + auto side-margins centers it without a
+   wrapper, since its parent (the site DOM) isn't ours to style. */
 a.wsbk-jump,
 a.wsbk-jump:visited {
-  display: inline-flex;
+  display: flex;
+  width: -webkit-fit-content;
+  width: fit-content;
+  margin: 14px auto;
   align-items: center;
-  gap: 6px;
-  margin: 8px 0;
-  padding: 7px 14px;
+  gap: 8px;
+  padding: 9px 18px;
   border-radius: 999px;
   background: #c1121f;
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  letter-spacing: 0.01em;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(193, 18, 31, 0.30);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 a.wsbk-jump:hover {
   background: #a50f1a;
+  box-shadow: 0 4px 14px rgba(193, 18, 31, 0.42);
+  transform: translateY(-1px);
+}
+a.wsbk-jump:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(193, 18, 31, 0.30);
+}
+a.wsbk-jump:focus-visible {
+  outline: 2px solid #c1121f;
+  outline-offset: 2px;
 }
