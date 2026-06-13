@@ -1,4 +1,4 @@
-# WorldSBK Results+
+# WorldSBK Results Plus
 
 An unofficial browser extension that enhances results pages on [worldsbk.com](https://www.worldsbk.com): it adds **gap** columns (to the leader and to the rider ahead), **championship points** on race sessions, and quick access to the official **Results** and **Standings** PDFs — so you can read a session at a glance instead.
 
@@ -28,6 +28,10 @@ Practice and qualifying sessions get no points column. Unclassified riders (DNF/
 ### Official PDFs (Results & Standings)
 
 Below the results widget, the extension appends a PDF panel for the page you're on, and a smooth-scroll "jump" link just above the results that animates down to it. The **Results** PDF is offered on every session; the **Championship Standings** PDF is added only on race sessions (where it exists), shown as a second tab. URLs come from the links the site already provides when present, otherwise they're built from the page's path segments (year / event / category / session) plus a fixed tail (`CLA/Results.pdf`, `STD/ChampionshipStandings.pdf`). PDFs embed inline where the browser allows it, and fall back to an "open in new tab" link when inline embedding is blocked.
+
+### The toolbar popup
+
+Clicking the extension's toolbar icon opens a small popup showing the version and a quick link to support development. It's informational only — no settings to configure, and nothing is stored.
 
 ## Install (Chrome / Edge / Brave)
 
