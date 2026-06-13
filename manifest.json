@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "WorldSBK Gap Columns",
+  "name": "WorldSBK Results+",
   "version": "1.0.0",
-  "description": "Adds 'Gap to 1st' and 'Gap to previous' columns to WorldSBK results tables.",
+  "description": "Unofficial enhancements for worldsbk.com results: gap columns, championship points, and the official Results/Standings PDFs.",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

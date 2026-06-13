@@ -1,8 +1,8 @@
-# WorldSBK Gap Columns
+# WorldSBK Results+
 
-A tiny browser extension that adds two columns — **Gap to 1st** and **Gap to previous** — to results tables on [worldsbk.com](https://www.worldsbk.com), so you can read the time gaps between riders at a glance instead of doing the subtraction in your head.
+An unofficial browser extension that enhances results pages on [worldsbk.com](https://www.worldsbk.com): it adds **gap** columns (to the leader and to the rider ahead), **championship points** on race sessions, and quick access to the official **Results** and **Standings** PDFs — so you can read a session at a glance instead of doing the subtraction in your head.
 
-![Screenshot placeholder — drop a capture of a results page with the two gap columns here](docs/screenshot.png)
+![Screenshot placeholder — drop a capture of an enhanced results page here](docs/screenshot.png)
 
 ## What it does
 
@@ -27,7 +27,7 @@ Practice and qualifying sessions get no points column. Unclassified riders (DNF/
 
 ### Official PDFs (Results & Standings)
 
-Below the results widget, the extension appends a tabbed panel with the official **Results** and **Championship Standings** PDFs for the page you're on. It uses the links the site already provides when present, otherwise it builds each URL from the page's path segments (year / event / category / session) plus a fixed tail (`CLA/Results.pdf`, `STD/ChampionshipStandings.pdf`). PDFs embed inline where the browser allows it, and fall back to an "open in new tab" link when inline embedding is blocked.
+Below the results widget, the extension appends a PDF panel for the page you're on, and a smooth-scroll "jump" link just above the results that animates down to it. The **Results** PDF is offered on every session; the **Championship Standings** PDF is added only on race sessions (where it exists), shown as a second tab. URLs come from the links the site already provides when present, otherwise they're built from the page's path segments (year / event / category / session) plus a fixed tail (`CLA/Results.pdf`, `STD/ChampionshipStandings.pdf`). PDFs embed inline where the browser allows it, and fall back to an "open in new tab" link when inline embedding is blocked.
 
 ## Install (Chrome / Edge / Brave)
 

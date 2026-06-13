@@ -1,15 +1,17 @@
 // WorldSBK Gap Columns
 // - Adds "Gap to 1st" and "Gap to prev" after the Time cell on every results table.
 // - On RACE sessions adds a "Pts" column with championship points.
-// - Appends a tabbed PDF panel (Results / Standings) below the results widget.
+// - Appends a PDF panel (Results always; Standings on races) below the results
+//   widget, plus a smooth-scroll "jump" link before it.
 
 const TABLE_SEL = "table.results-table__table";
 const TIME_HEAD = ".results-table__header-cell--time";
 const TIME_CELL = ".results-table__body-cell--time";
 const POS_CELL = ".results-table__body-cell--pos";
-const RESULTS_SEL = ".results"; // the widget container; PDF panel goes right after it
-const TAG = "wsbk-col";   // marks injected table cells (idempotent re-runs)
+const RESULTS_SEL = ".results"; // the widget container
+const TAG = "wsbk-col";    // marks injected table cells (idempotent re-runs)
 const PDF_TAG = "wsbk-pdf"; // marks the injected PDF panel
+const JUMP_TAG = "wsbk-jump"; // marks the smooth-scroll link
 
 // Championship points by finishing position.
 const POINTS_FULL = {
@@ -20,8 +22,7 @@ const POINTS_SPRINT = {
   1: 12, 2: 10, 3: 9, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2,
 };
 
-// Session is identified by the LAST path segment of the URL (the site's <select>
-// does not reflect the active session).
+// Session is identified by the LAST path segment of the URL.
 const RACE_CODES = { "001": POINTS_FULL, "003": POINTS_FULL, "002": POINTS_SPRINT };
 
 function sessionCode() {
@@ -40,16 +41,19 @@ function pointsTableFor() {
   return null;
 }
 
+function isRaceSession() {
+  return pointsTableFor() != null;
+}
+
 // ----- PDF panel (Results / Standings) ------------------------------------
 
-// Each PDF: a tab label, the site link text to match, and the URL tail to build.
+// tab: label; linkText: site link to match; tail: URL tail to build;
+// racesOnly: only offered on race sessions (Standings PDF doesn't exist otherwise).
 const PDFS = [
   { tab: "Results", linkText: "results", tail: "CLA/Results.pdf" },
-  { tab: "Standings", linkText: "championship standings", tail: "STD/ChampionshipStandings.pdf" },
+  { tab: "Standings", linkText: "championship standings", tail: "STD/ChampionshipStandings.pdf", racesOnly: true },
 ];
 
-// Base URL for this session's files, from the page path:
-//   /en/results/2026/ara/sbk/003 -> https://resources.worldsbk.com/files/results/2026/ARA/SBK/003/
 function pdfBase() {
   const parts = location.pathname.split("/").filter(Boolean);
   const i = parts.indexOf("results");
@@ -62,7 +66,6 @@ function pdfBase() {
   );
 }
 
-// Resolve one PDF's URL: prefer the link the site already rendered, else build it.
 function pdfUrl(spec) {
   for (const a of document.querySelectorAll(".results-pdf__list-link")) {
     const desc = a.querySelector(".results-pdf__list-description") || a;
@@ -75,7 +78,6 @@ function pdfUrl(spec) {
 let pdfActive = 0;      // remembered tab index across rebuilds
 let pdfBuiltKey = null; // session code the current panel was built for
 
-// Build the <object> embed (with fallback link) for the active spec.
 function renderViewer(viewer, openLink, spec) {
   openLink.href = spec.url;
   viewer.textContent = "";
@@ -104,8 +106,13 @@ function injectPdf() {
   // Already built for this session and correctly placed -> leave it (no reload).
   if (existing && pdfBuiltKey === code && container.nextElementSibling === existing) return;
   if (existing) existing.remove();
+  document.querySelectorAll("." + JUMP_TAG).forEach((n) => n.remove());
 
-  const specs = PDFS.map((s) => ({ ...s, url: pdfUrl(s) })).filter((s) => s.url);
+  const races = isRaceSession();
+  const specs = PDFS
+    .filter((s) => !s.racesOnly || races)
+    .map((s) => ({ ...s, url: pdfUrl(s) }))
+    .filter((s) => s.url);
   if (!specs.length) { pdfBuiltKey = null; return; }
   if (pdfActive >= specs.length) pdfActive = 0;
 
@@ -114,9 +121,6 @@ function injectPdf() {
 
   const bar = document.createElement("div");
   bar.className = PDF_TAG + "__bar";
-
-  const tabs = document.createElement("div");
-  tabs.className = PDF_TAG + "__tabs";
 
   const openLink = document.createElement("a");
   openLink.className = PDF_TAG + "__link";
@@ -127,27 +131,51 @@ function injectPdf() {
   const viewer = document.createElement("div");
   viewer.className = PDF_TAG + "__viewer";
 
-  const tabButtons = specs.map((spec, idx) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = PDF_TAG + "__tab" + (idx === pdfActive ? " " + PDF_TAG + "__tab--active" : "");
-    b.textContent = spec.tab;
-    b.addEventListener("click", () => {
-      pdfActive = idx;
-      tabButtons.forEach((tb, j) =>
-        tb.classList.toggle(PDF_TAG + "__tab--active", j === idx)
-      );
-      renderViewer(viewer, openLink, specs[idx]);
+  if (specs.length === 1) {
+    // Single PDF -> plain title, no tab UI.
+    const title = document.createElement("span");
+    title.className = PDF_TAG + "__title";
+    title.textContent =
+      specs[0].tab === "Results" ? "Official Results PDF" : specs[0].tab + " PDF";
+    bar.append(title, openLink);
+  } else {
+    const tabs = document.createElement("div");
+    tabs.className = PDF_TAG + "__tabs";
+    const tabButtons = specs.map((spec, idx) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className =
+        PDF_TAG + "__tab" + (idx === pdfActive ? " " + PDF_TAG + "__tab--active" : "");
+      b.textContent = spec.tab;
+      b.addEventListener("click", () => {
+        pdfActive = idx;
+        tabButtons.forEach((tb, j) =>
+          tb.classList.toggle(PDF_TAG + "__tab--active", j === idx)
+        );
+        renderViewer(viewer, openLink, specs[idx]);
+      });
+      return b;
     });
-    return b;
-  });
-  tabButtons.forEach((b) => tabs.append(b));
+    tabButtons.forEach((b) => tabs.append(b));
+    bar.append(tabs, openLink);
+  }
 
-  bar.append(tabs, openLink);
   panel.append(bar, viewer);
   renderViewer(viewer, openLink, specs[pdfActive]);
-
   container.after(panel);
+
+  // Smooth-scroll link before the results widget.
+  const jump = document.createElement("a");
+  jump.className = JUMP_TAG;
+  jump.href = "#";
+  jump.textContent =
+    (specs.length > 1 ? "Jump to Results & Standings PDFs" : "Jump to Results PDF") + " \u2193";
+  jump.addEventListener("click", (e) => {
+    e.preventDefault();
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  container.before(jump);
+
   pdfBuiltKey = code;
 }
 

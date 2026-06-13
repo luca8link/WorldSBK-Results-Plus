@@ -79,3 +79,28 @@ td.results-table__body-cell.wsbk-points {
 .wsbk-pdf__viewer {
   display: block;
 }
+
+/* Don't let the panel tuck under the site's sticky header when scrolled to. */
+.wsbk-pdf {
+  scroll-margin-top: 80px;
+}
+
+/* Smooth-scroll "jump to PDFs" pill, placed before the results widget. */
+a.wsbk-jump,
+a.wsbk-jump:visited {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #c1121f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+a.wsbk-jump:hover {
+  background: #a50f1a;
+}
