@@ -69,9 +69,6 @@ If you find this useful, you can buy me a coffee ☕
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/luca8link)
 
-## Credits
-
-Icon: <a href="https://www.flaticon.com/free-icons/motorcycle" title="motorcycle icons">Motorcycle icons created by Freepik - Flaticon</a>
 
 ## License
 
