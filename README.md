@@ -2,9 +2,10 @@
 
 An unofficial browser extension that enhances results **and standings** pages on [worldsbk.com](https://www.worldsbk.com): **gap** columns (to the leader and the rider ahead), **championship points** on race sessions, **points-gap** columns and a **leader-advantage** summary on the standings, and quick access to the official **Results** and **Standings** PDFs — so you can read everything at a glance.
 
-![Screenshot](docs/screenshot.png)
 
 ## What it does
+
+![Screenshot](docs/screenshot.png)
 
 WorldSBK results tables list each rider's lap/race time but not the gaps. This extension parses those times and injects two cells right after the time column:
 
