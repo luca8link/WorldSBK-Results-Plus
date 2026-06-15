@@ -1,7 +1,9 @@
 /* Injected columns — selectors are scoped with the site's own cell class so they
    out-specify worldsbk.com's stylesheet regardless of load order. */
 th.results-table__header-cell.wsbk-col,
-td.results-table__body-cell.wsbk-col {
+td.results-table__body-cell.wsbk-col,
+th.standings-table__header-cell.wsbk-col,
+td.standings-table__body-cell.wsbk-col {
   text-align: right;
   white-space: nowrap;
   font-size: 14px;

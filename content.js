@@ -1,6 +1,7 @@
 // WorldSBK Gap Columns
 // - Adds "Gap to 1st" and "Gap to prev" after the Time cell on every results table.
 // - On RACE sessions adds a "Pts" column with championship points.
+// - Adds points "Gap 1st"/"Gap Prev" columns on the championship standings table.
 // - Appends a PDF panel (Results always; Standings on races) below the results
 //   widget, plus a smooth-scroll "jump" link before it.
 
@@ -256,6 +257,63 @@ function enhance(table) {
   });
 }
 
+// ----- Standings table: points gap columns ---------------------------------
+
+const STANDINGS_SEL = "table.standings-table__table";
+const STD_PTS_HEAD = ".standings-table__header-cell--time"; // the "Pts." column
+const STD_PTS_CELL = ".standings-table__body-cell--time";
+
+function fmtPtsGap(delta) {
+  if (delta == null) return "–";
+  if (delta <= 0) return "0";   // leader, or level on points
+  return "-" + delta;           // points behind (a deficit)
+}
+
+function stdTh(label) {
+  const el = document.createElement("th");
+  el.className = "standings-table__header-cell " + TAG;
+  el.textContent = label;
+  return el;
+}
+
+function stdTd(text) {
+  const el = document.createElement("td");
+  el.className = "standings-table__body-cell " + TAG;
+  el.textContent = text;
+  return el;
+}
+
+// Standings rows are already sorted by points (descending). After the "Pts."
+// cell we inject the gap to the leader and to the rider immediately ahead.
+function enhanceStandings(table) {
+  table.querySelectorAll("." + TAG).forEach((n) => n.remove());
+
+  const headRow = table.querySelector("thead tr");
+  const ptsHead = headRow && headRow.querySelector(STD_PTS_HEAD);
+  if (!ptsHead) return;
+
+  ptsHead.after(stdTh("Gap 1st"), stdTh("Gap Prev"));
+
+  let leaderPts = null;
+  let prevPts = null;
+
+  table.querySelectorAll("tbody tr").forEach((row) => {
+    const ptsCell = row.querySelector(STD_PTS_CELL);
+    if (!ptsCell) return;
+
+    const pts = parseInt(ptsCell.textContent.trim(), 10);
+    let gap1st = "–";
+    let gapPrev = "–";
+    if (Number.isFinite(pts)) {
+      if (leaderPts == null) leaderPts = pts;
+      gap1st = fmtPtsGap(leaderPts - pts);
+      gapPrev = prevPts == null ? "–" : fmtPtsGap(prevPts - pts);
+      prevPts = pts;
+    }
+    ptsCell.after(stdTd(gap1st), stdTd(gapPrev));
+  });
+}
+
 // ----- Orchestration -------------------------------------------------------
 
 let timer = null;
@@ -264,6 +322,7 @@ let observer = null;
 function run() {
   if (observer) observer.disconnect();
   document.querySelectorAll(TABLE_SEL).forEach(enhance);
+  document.querySelectorAll(STANDINGS_SEL).forEach(enhanceStandings);
   injectPdf();
   if (observer) observer.observe(document.body, { childList: true, subtree: true });
 }
