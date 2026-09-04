@@ -257,28 +257,16 @@ function enhance(table) {
   });
 }
 
-// ----- Standings table: points gap columns + leader summary ----------------
+// ----- Standings table: points gap columns ---------------------------------
 
 const STANDINGS_SEL = "table.standings-table__table";
 const STD_PTS_HEAD = ".standings-table__header-cell--time"; // the "Pts." column
 const STD_PTS_CELL = ".standings-table__body-cell--time";
-const STD_NAME_CELL = ".standings-table__body-cell--full-name";
-const SUMMARY_TAG = "wsbk-std-summary"; // leader-advantage line above the table
-const RACE_MAX = 25;    // points for a single full-distance race win
-const WEEKEND_MAX = 62; // max per weekend: two race wins (25+25) + Superpole win (12)
 
 function fmtPtsGap(delta) {
   if (delta == null) return "–";
   if (delta <= 0) return "0";   // leader, or level on points
   return "-" + delta;           // points behind (a deficit)
-}
-
-// Remaining weekends = upcoming events in the GP-promos rail; null when absent.
-function weekendsRemaining() {
-  const rail = document.querySelector(
-    ".content-rail--gp-promos .content-rail__listing-container"
-  );
-  return rail ? rail.querySelectorAll(".gp-promo-item").length : null;
 }
 
 function stdTh(label) {
@@ -295,43 +283,8 @@ function stdTd(text) {
   return el;
 }
 
-// Leader-only summary above the table: the lead over 2nd place expressed in
-// race wins and weekends, plus how many weekends are left. (A lead of one
-// weekend over 2nd is by definition a lead over everyone below it, so 2nd is
-// the only follower that matters.)
-function renderStandingsSummary(table, leaderName, leaderPts, secondPts) {
-  const prev = table.previousElementSibling;
-  if (prev && prev.classList && prev.classList.contains(SUMMARY_TAG)) prev.remove();
-  if (leaderPts == null) return;
-
-  const rem = weekendsRemaining();
-  const advPts = secondPts == null ? null : leaderPts - secondPts;
-  if (advPts == null && rem == null) return; // nothing useful to show
-
-  const parts = [];
-  if (advPts != null) {
-    const races = (advPts / RACE_MAX).toFixed(1);
-    const weeks = (advPts / WEEKEND_MAX).toFixed(1);
-    parts.push(
-      leaderName + " leads by " + advPts + " pts — ~" + races +
-      " races / ~" + weeks + " weekends clear"
-    );
-  } else {
-    parts.push(leaderName + " leads");
-  }
-  if (rem != null) {
-    parts.push(rem === 1 ? "1 weekend remaining" : rem + " weekends remaining");
-  }
-
-  const el = document.createElement("div");
-  el.className = SUMMARY_TAG;
-  el.textContent = parts.join(" · ");
-  table.before(el);
-}
-
 // Standings rows are already sorted by points (descending). After the "Pts."
-// cell we inject the gap to the leader and to the rider immediately ahead;
-// the leader's advantage over 2nd is summarised on a line above the table.
+// cell we inject the gap to the leader and to the rider immediately ahead.
 function enhanceStandings(table) {
   table.querySelectorAll("." + TAG).forEach((n) => n.remove());
 
@@ -342,9 +295,7 @@ function enhanceStandings(table) {
   ptsHead.after(stdTh("Gap 1st"), stdTh("Gap Prev"));
 
   let leaderPts = null;
-  let secondPts = null;
   let prevPts = null;
-  let rank = 0;
 
   table.querySelectorAll("tbody tr").forEach((row) => {
     const ptsCell = row.querySelector(STD_PTS_CELL);
@@ -354,19 +305,13 @@ function enhanceStandings(table) {
     let gap1st = "–";
     let gapPrev = "–";
     if (Number.isFinite(pts)) {
-      rank++;
-      if (rank === 1) leaderPts = pts;
-      else if (rank === 2) secondPts = pts;
+      if (leaderPts == null) leaderPts = pts;
       gap1st = fmtPtsGap(leaderPts - pts);
       gapPrev = prevPts == null ? "–" : fmtPtsGap(prevPts - pts);
       prevPts = pts;
     }
     ptsCell.after(stdTd(gap1st), stdTd(gapPrev));
   });
-
-  const nameEl = table.querySelector("tbody tr " + STD_NAME_CELL);
-  const leaderName = nameEl ? nameEl.textContent.replace(/\s+/g, " ").trim() : "Leader";
-  renderStandingsSummary(table, leaderName, leaderPts, secondPts);
 }
 
 // ----- Orchestration -------------------------------------------------------
