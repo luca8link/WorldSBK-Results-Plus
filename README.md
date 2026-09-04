@@ -28,12 +28,8 @@ Practice and qualifying sessions get no points column. Unclassified riders (DNF/
 
 ### Championship standings
 
-![Screenshot](docs/standings.png)
-
 
 On a championship **standings** table the extension adds the same two gap columns, but measured in **points**: **Gap 1st** (points behind the leader) and **Gap Prev** (points behind the rider directly ahead), shown as a deficit such as `-94`. The leader shows `0`, and riders level on points show `0`.
-
-Above the table it also adds a one-line **leader summary**: how far the championship leader is ahead of 2nd place, expressed in race wins (`25` pts) and full weekends (`62` pts = two race wins + a Superpole Race win), plus how many weekends remain in the season. A lead of one weekend over 2nd is by definition a lead over everyone below it, so only the gap to 2nd is measured; remaining weekends are counted from the site's upcoming-events rail.
 
 ### Official PDFs (Results & Standings)
 
