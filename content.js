@@ -25,19 +25,37 @@ const POINTS_SPRINT = {
 
 // Session is identified by the LAST path segment of the URL.
 const RACE_CODES = { "001": POINTS_FULL, "003": POINTS_FULL, "002": POINTS_SPRINT };
+const SESSION_OPT_SEL = 'select[name="results-filter-session"] option';
 
 function sessionCode() {
   const seg = location.pathname.split("/").filter(Boolean).pop() || "";
   return seg.toUpperCase();
 }
 
+// Label of the session-filter option for a code (e.g. "Race 2", "Race 2 - Red Flag").
+function sessionLabel(code) {
+  const opt = document.querySelector(SESSION_OPT_SEL + '[value="' + code + '"]');
+  return opt ? opt.textContent.trim() : "";
+}
+
+// A red-flagged race that was re-run doesn't award points: its result is
+// superseded by a same-named session (e.g. "Race 2 - Red Flag" then "Race 2").
+function isSupersededRedFlag(label, code) {
+  if (!/red[\s-]*flag/i.test(label)) return false;
+  const base = label.replace(/[\s\-–—(]*red[\s-]*flag.*$/i, "").trim().toLowerCase();
+  if (!base) return false;
+  for (const o of document.querySelectorAll(SESSION_OPT_SEL)) {
+    if (o.value.toUpperCase() === code) continue; // skip the red-flag session itself
+    if (o.textContent.trim().toLowerCase() === base) return true; // the re-run exists
+  }
+  return false;
+}
+
 function pointsTableFor() {
   const code = sessionCode();
+  const label = sessionLabel(code);
+  if (isSupersededRedFlag(label, code)) return null; // aborted + re-run -> no points
   if (RACE_CODES[code]) return RACE_CODES[code];
-  const opt = document.querySelector(
-    'select[name="results-filter-session"] option[value="' + code + '"]'
-  );
-  const label = opt ? opt.textContent.trim() : "";
   if (/race/i.test(label)) return /superpole/i.test(label) ? POINTS_SPRINT : POINTS_FULL;
   return null;
 }
